@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
-import globalRouter from "./routes/global.route.js";
+import api from "./routes/api.js";
 
 dotenv.config();
 
@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello World!" });
 });
 
-app.use("/api", globalRouter);
+app.use("/api", api);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

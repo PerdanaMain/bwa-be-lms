@@ -1,0 +1,24 @@
+{
+  "name": "be-lms",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PerdanaMain/bwa-be-lms.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PerdanaMain/bwa-be-lms/issues"
+  },
+  "homepage": "https://github.com/PerdanaMain/bwa-be-lms#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

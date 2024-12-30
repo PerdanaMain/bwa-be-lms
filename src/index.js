@@ -3,22 +3,29 @@ import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
 import api from "./routes/api.js";
+import db from "./utils/database.js";
 
-dotenv.config();
+function main() {
+  dotenv.config();
 
-const app = express();
-const port = 3000;
+  db();
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static("public"));
+  const app = express();
+  const port = 3000;
 
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Hello World!" });
-});
+  app.use(cors());
+  app.use(bodyParser.json());
+  app.use(express.static("public"));
 
-app.use("/api", api);
+  app.get("/", (req, res) => {
+    res.status(200).json({ message: "Hello World!" });
+  });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+  app.use("/api", api);
+
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
+
+main();

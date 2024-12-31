@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 export default async function connectDB() {
   const DATABASE_URL = process.env.DATABASE_URL ?? "";
-
+  const DATABASE_NAME = process.env.DATABASE_NAME ?? "";
   try {
     await mongoose.connect(DATABASE_URL, {
-      dbName: "bwaLmsDatabase",
+      dbName: DATABASE_NAME,
     });
   } catch (error) {
     console.log("Database connection failed", error.message);

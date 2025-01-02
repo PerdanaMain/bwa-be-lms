@@ -1,9 +1,9 @@
 import express from "express";
-import { signUpAction } from "../controllers/auth.controller.js";
+import { signInAction, signUpAction } from "../controllers/auth.controller.js";
 import { handlePayment } from "../controllers/payment.controller.js";
 import { helloWorld } from "../controllers/global.controller.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
-import { exampleSchema, signUpSchema } from "../utils/schema.js";
+import { exampleSchema, signInSchema, signUpSchema } from "../utils/schema.js";
 
 const router = express.Router();
 
@@ -18,6 +18,7 @@ router.post(
 
 // AUTH ROUTES
 router.post("/sign-up", validateRequest(signUpSchema), signUpAction);
+router.post("/sign-in", validateRequest(signInSchema), signInAction);
 
 // TRANSACTION ROUTES
 router.post("/handle-payment-midtrans", handlePayment);

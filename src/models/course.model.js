@@ -8,12 +8,10 @@ const courseModel = mongoose.Schema(
     },
     thumbnail: {
       type: mongoose.Schema.Types.String,
-      required: true,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: true,
     },
     tagline: {
       type: mongoose.Schema.Types.String,

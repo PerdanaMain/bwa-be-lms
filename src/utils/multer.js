@@ -14,9 +14,9 @@ export const fileStorageCourse = multer.diskStorage({
 
 export const fileFilter = (req, file, cb) => {
   if (
-    file.mimeType == "images/jpeg" ||
-    file.mimeType == "images/png" ||
-    file.mimeType == "images/jpg"
+    file.mimetype == "image/jpeg" ||
+    file.mimetype == "image/png" ||
+    file.mimetype == "image/jpg"
   ) {
     cb(null, true);
   } else {

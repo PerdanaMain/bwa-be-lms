@@ -18,9 +18,19 @@ export const getCourses = async (req, res) => {
         path: "students",
         select: "name",
       });
+
+    const image_url = process.env.APP_URL + "/uploads/courses/";
+    const response = courses.map((course) => {
+      return {
+        ...course.toObject(),
+        thumbnail_url: image_url + course.thumbnail,
+        total_students: course.students.length,
+      };
+    });
+
     res.status(200).json({
       message: "Get all courses successfully",
-      data: courses,
+      data: response,
     });
   } catch (error) {
     return res
@@ -87,7 +97,6 @@ export const postCourse = async (req, res) => {
 
     return res.status(201).json({
       message: "Course created successfully",
-      data: course,
     });
   } catch (error) {
     return res

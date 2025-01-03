@@ -5,7 +5,7 @@ export const verifyToken = async (req, res, next) => {
 
   //  Authorization: JWT <token>
   const headerPrefix = req?.headers?.authorization?.split(" ")[0];
-  if (headerPrefix === "JWT") {
+  if (headerPrefix === "Bearer") {
     const token = req?.headers?.authorization?.split(" ")[1];
     const decoded = jwt.verify(token, secretKey);
 

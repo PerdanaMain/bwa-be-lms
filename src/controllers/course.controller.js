@@ -12,7 +12,7 @@ export const getCourses = async (req, res) => {
       .select("name thumbnail")
       .populate({
         path: "category",
-        select: "name -_id", // exclude _id
+        select: "name", // exclude _id
       })
       .populate({
         path: "students",

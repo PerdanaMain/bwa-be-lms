@@ -1,7 +1,12 @@
 import express from "express";
 import multer from "multer";
 import { signInAction, signUpAction } from "../controllers/auth.controller.js";
-import { getCourses, postCourse } from "../controllers/course.controller.js";
+import {
+  deleteCourse,
+  getCourses,
+  postCourse,
+  updateCourse,
+} from "../controllers/course.controller.js";
 import { handlePayment } from "../controllers/payment.controller.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
 import { verifyToken } from "../middlewares/verify-token.middleware.js";
@@ -25,6 +30,13 @@ router.post("/sign-in", validateRequest(signInSchema), signInAction);
 // COURSE ROUTES
 router.get("/courses", verifyToken, getCourses);
 router.post("/courses", verifyToken, upload.single("thumbnail"), postCourse);
+router.put(
+  "/courses/:id",
+  verifyToken,
+  upload.single("thumbnail"),
+  updateCourse
+);
+router.delete("/courses/:id", verifyToken, deleteCourse);
 
 // CATEGORY ROUTES
 router.get("/categories", getCategories);

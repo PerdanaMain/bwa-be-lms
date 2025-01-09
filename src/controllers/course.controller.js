@@ -3,6 +3,7 @@ import { mutateCourseSchema } from "../utils/schema.js";
 import CategoryModel from "../models/category.model.js";
 import fs from "fs";
 import UserModel from "../models/user.model.js";
+import path from "path";
 
 export const getCourses = async (req, res) => {
   try {
@@ -25,6 +26,9 @@ export const getCourses = async (req, res) => {
         ...course.toObject(),
         thumbnail_url: image_url + course.thumbnail,
         total_students: course.students.length,
+        category: {
+          name: "programming",
+        },
       };
     });
 
@@ -43,8 +47,6 @@ export const postCourse = async (req, res) => {
   try {
     const body = req.body;
     const parse = mutateCourseSchema.safeParse(body);
-
-    console.log(req.file);
 
     if (!parse.success) {
       const errorMessages = parse.error.issues.map((err) => err.message);
@@ -97,6 +99,85 @@ export const postCourse = async (req, res) => {
 
     return res.status(201).json({
       message: "Course created successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", detail: error.message });
+  }
+};
+export const updateCourse = async (req, res) => {
+  try {
+    const body = req.body;
+    const parse = mutateCourseSchema.safeParse(body);
+    const courseId = req.params.id;
+
+    if (!parse.success) {
+      const errorMessages = parse.error.issues.map((err) => err.message);
+
+      // remove the file already uploaded
+      if (req?.file?.path && fs.existsSync(req?.file?.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+
+      return res.status(500).json({
+        message: "Invalid input",
+        detail: errorMessages,
+      });
+    }
+
+    const category = await CategoryModel.findById(parse.data.categoryId);
+    const oldCourse = await CourseModel.findById(courseId);
+
+    if (!category) {
+      return res.status(404).json({
+        message: "categoryId not found",
+      });
+    }
+
+    await CourseModel.findByIdAndUpdate(
+      {
+        _id: courseId,
+      },
+      {
+        name: parse.data.name,
+        categoryId: parse.data.categoryId,
+        description: parse.data.description,
+        tagline: parse.data.tagline,
+        thumbnail: req?.file ? req?.file?.filename : oldCourse.thumbnail,
+        manager: req.user._id,
+      }
+    );
+
+    return res.status(201).json({
+      message: "Course updated successfully",
+      data: await CourseModel.findById(courseId),
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", detail: error.message });
+  }
+};
+
+export const deleteCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = await CourseModel.findById(id);
+    const filePath = path.join(
+      path.resolve(),
+      "public/uploads/courses",
+      course.thumbnail
+    );
+
+    if (fs.existsSync(path)) {
+      fs.unlinkSync(filePath);
+    }
+
+    await CourseModel.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      message: "Course deleted successfully",
     });
   } catch (error) {
     return res

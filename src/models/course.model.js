@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import categoryModel from "./category.model.js";
+import courseDetailModel from "./course-detail.model.js";
 
 const courseModel = mongoose.Schema(
   {
@@ -42,5 +44,22 @@ const courseModel = mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Cascade delete course details when course is deleted
+courseModel.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    await categoryModel.findByIdAndUpdate(doc.category, {
+      $pull: { courses: doc._id },
+    });
+
+    await courseDetailModel.deleteMany({ course: doc._id });
+
+    doc.students?.map(async (std) => {
+      await userModel.findByIdAndUpdate(std._id, {
+        $pull: { courses: doc._id },
+      });
+    });
+  }
+});
 
 export default mongoose.model("Course", courseModel);

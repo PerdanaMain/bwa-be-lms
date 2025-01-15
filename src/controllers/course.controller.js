@@ -13,7 +13,7 @@ export const getCourses = async (req, res) => {
       .select("name thumbnail")
       .populate({
         path: "category",
-        select: "name", // exclude _id
+        select: "name -_id",
       })
       .populate({
         path: "students",
@@ -26,9 +26,6 @@ export const getCourses = async (req, res) => {
         ...course.toObject(),
         thumbnail_url: image_url + course.thumbnail,
         total_students: course.students.length,
-        category: {
-          name: "programming",
-        },
       };
     });
 
@@ -72,7 +69,7 @@ export const postCourse = async (req, res) => {
 
     const course = new CourseModel({
       name: parse.data.name,
-      categoryId: parse.data.categoryId,
+      category: category._id,
       description: parse.data.description,
       tagline: parse.data.tagline,
       thumbnail: req?.file?.filename,
@@ -109,79 +106,96 @@ export const postCourse = async (req, res) => {
 export const updateCourse = async (req, res) => {
   try {
     const body = req.body;
-    const parse = mutateCourseSchema.safeParse(body);
     const courseId = req.params.id;
+
+    const parse = mutateCourseSchema.safeParse(body);
 
     if (!parse.success) {
       const errorMessages = parse.error.issues.map((err) => err.message);
 
-      // remove the file already uploaded
-      if (req?.file?.path && fs.existsSync(req?.file?.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-
       return res.status(500).json({
-        message: "Invalid input",
-        detail: errorMessages,
+        message: "Error Validation",
+        data: null,
+        errors: errorMessages,
       });
     }
 
     const category = await CategoryModel.findById(parse.data.categoryId);
     const oldCourse = await CourseModel.findById(courseId);
 
+    // delete old thumbnail
+    const dirname = path.resolve();
+    const filePath = path.join(
+      dirname,
+      "public/uploads/courses",
+      oldCourse.thumbnail
+    );
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
     if (!category) {
-      return res.status(404).json({
-        message: "categoryId not found",
+      return res.status(500).json({
+        message: "Category Id not found",
       });
     }
 
-    await CourseModel.findByIdAndUpdate(
-      {
-        _id: courseId,
-      },
-      {
-        name: parse.data.name,
-        categoryId: parse.data.categoryId,
-        description: parse.data.description,
-        tagline: parse.data.tagline,
-        thumbnail: req?.file ? req?.file?.filename : oldCourse.thumbnail,
-        manager: req.user._id,
-      }
-    );
+    await CourseModel.findByIdAndUpdate(courseId, {
+      name: parse.data.name,
+      category: category._id,
+      description: parse.data.description,
+      tagline: parse.data.tagline,
+      thumbnail: req?.file ? req.file?.filename : oldCourse.thumbnail,
+      manager: req.user._id,
+    });
 
-    return res.status(201).json({
-      message: "Course updated successfully",
-      data: await CourseModel.findById(courseId),
+    return res.json({
+      message: "Update Course Success",
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", detail: error.message });
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error.message,
+    });
   }
 };
 
 export const deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
+
     const course = await CourseModel.findById(id);
+
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found",
+      });
+    }
+
+    const dirname = path.resolve();
+
     const filePath = path.join(
-      path.resolve(),
+      dirname,
       "public/uploads/courses",
       course.thumbnail
     );
 
-    if (fs.existsSync(path)) {
+    if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
 
     await CourseModel.findByIdAndDelete(id);
 
-    return res.status(200).json({
-      message: "Course deleted successfully",
+    return res.json({
+      message: "Delete course success",
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", detail: error.message });
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error.message,
+    });
   }
 };

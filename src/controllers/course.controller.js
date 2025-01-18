@@ -195,9 +195,11 @@ export const updateCourse = async (req, res) => {
     };
 
     await cloudinary.uploader.destroy(oldCourse.thumbnail);
-    const thumbnailInfo = await uploadToCloudinary(req?.file?.buffer);
 
-    updateData.thumbnail = thumbnailInfo.public_id;
+    if (req?.file?.buffer) {
+      const thumbnailInfo = await uploadToCloudinary(req?.file?.buffer);
+      updateData.thumbnail = thumbnailInfo.public_id;
+    }
 
     const course = await CourseModel.findByIdAndUpdate(courseId, updateData, {
       new: true,

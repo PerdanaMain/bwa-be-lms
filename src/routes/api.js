@@ -6,6 +6,7 @@ import {
   getCourses,
   postCourse,
   updateCourse,
+  getCourseById,
 } from "../controllers/course.controller.js";
 import { handlePayment } from "../controllers/payment.controller.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
@@ -29,6 +30,7 @@ router.post("/sign-in", validateRequest(signInSchema), signInAction);
 
 // COURSE ROUTES
 router.get("/courses", verifyToken, getCourses);
+router.get("/courses/:id", verifyToken, getCourseById);
 router.post("/courses", verifyToken, upload.single("thumbnail"), postCourse);
 router.put(
   "/courses/:id",

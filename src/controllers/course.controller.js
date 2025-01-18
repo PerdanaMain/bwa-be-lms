@@ -40,6 +40,36 @@ export const getCourses = async (req, res) => {
   }
 };
 
+export const getCourseById = async (req, res) => {
+  try {
+    const course = await CourseModel.findById(req.params.id)
+      .select("name thumbnail")
+      .populate({
+        path: "category",
+        select: "name -_id",
+      })
+      .populate({
+        path: "students",
+        select: "name",
+      });
+
+    const response = {
+      ...course.toObject(),
+      thumbnailUrl: cloudinary.url(course.thumbnail),
+      total_students: course.students.length,
+    };
+
+    return res.json({
+      message: "Get course by id successfully",
+      data: response,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", detail: error.message });
+  }
+};
+
 const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
     // Pastikan buffer ada dan valid

@@ -2,9 +2,9 @@ import CourseModel from "../models/course.model.js";
 import { mutateCourseSchema } from "../utils/schema.js";
 import CategoryModel from "../models/category.model.js";
 import fs from "fs";
-import UserModel from "../models/user.model.js";
-import path from "path";
 import cloudinary from "../utils/cloudinary.js";
+import streamifier from "streamifier";
+import UserModel from "../models/user.model.js";
 
 export const getCourses = async (req, res) => {
   try {
@@ -40,6 +40,32 @@ export const getCourses = async (req, res) => {
   }
 };
 
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    // Pastikan buffer ada dan valid
+    if (!buffer) {
+      reject(new Error("No buffer to upload"));
+      return;
+    }
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "bwa-lms",
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+
+    // Tambahkan error handling untuk stream
+    const stream = streamifier.createReadStream(buffer);
+    stream.on("error", (error) => reject(error));
+
+    stream.pipe(uploadStream);
+  });
+};
+
 export const postCourse = async (req, res) => {
   try {
     const body = req.body;
@@ -67,9 +93,7 @@ export const postCourse = async (req, res) => {
       });
     }
 
-    const thumbnailInfo = await cloudinary.uploader.upload(req?.file?.path, {
-      folder: "bwa-lms",
-    });
+    const thumbnailInfo = await uploadToCloudinary(req?.file?.buffer);
 
     const course = new CourseModel({
       name: parse.data.name,
@@ -97,10 +121,6 @@ export const postCourse = async (req, res) => {
       },
       { new: true }
     );
-
-    if (req?.file?.path && fs.existsSync(req?.file?.path)) {
-      fs.unlinkSync(req.file.path);
-    }
 
     return res.status(201).json({
       message: "Course created successfully",

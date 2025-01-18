@@ -194,16 +194,10 @@ export const updateCourse = async (req, res) => {
       manager: req.user._id,
     };
 
-    if (req?.file?.path && fs.existsSync(req?.file?.path)) {
-      await cloudinary.uploader.destroy(oldCourse.thumbnail);
+    await cloudinary.uploader.destroy(oldCourse.thumbnail);
+    const thumbnailInfo = await uploadToCloudinary(req?.file?.buffer);
 
-      const thumbnail = await cloudinary.uploader.upload(req?.file?.path, {
-        folder: "bwa-lms",
-      });
-      updateData.thumbnail = thumbnail.public_id;
-
-      fs.unlinkSync(req.file.path);
-    }
+    updateData.thumbnail = thumbnailInfo.public_id;
 
     const course = await CourseModel.findByIdAndUpdate(courseId, updateData, {
       new: true,

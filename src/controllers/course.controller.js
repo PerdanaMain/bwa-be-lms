@@ -42,6 +42,7 @@ export const getCourses = async (req, res) => {
 
 export const getCourseById = async (req, res) => {
   try {
+    const { preview } = req.query;
     const course = await CourseModel.findById(req.params.id)
       .populate({
         path: "category",
@@ -50,6 +51,11 @@ export const getCourseById = async (req, res) => {
       .populate({
         path: "students",
         select: "name",
+      })
+      .populate({
+        path: "details",
+        select:
+          preview === "true" ? "title type youtubeId text " : "title type",
       });
 
     const response = {
@@ -299,6 +305,23 @@ export const updateContentCourse = async (req, res) => {
 
     return res.status(200).json({
       message: "Content updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error.message,
+    });
+  }
+};
+
+export const deleteContentCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await CourseDetailModel.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      message: "Content deleted successfully",
     });
   } catch (error) {
     return res.status(500).json({

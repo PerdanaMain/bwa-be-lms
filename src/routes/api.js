@@ -7,7 +7,9 @@ import {
   postCourse,
   updateCourse,
   getCourseById,
+  postContentCourse,
 } from "../controllers/course.controller.js";
+import { mutateContentSchema } from "../utils/schema.js";
 import { handlePayment } from "../controllers/payment.controller.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
 import { verifyToken } from "../middlewares/verify-token.middleware.js";
@@ -39,6 +41,14 @@ router.put(
   updateCourse
 );
 router.delete("/courses/:id", verifyToken, deleteCourse);
+
+// CONTENT ROUTES
+router.post(
+  "/courses/content",
+  verifyToken,
+  validateRequest(mutateContentSchema),
+  postContentCourse
+);
 
 // CATEGORY ROUTES
 router.get("/categories", getCategories);

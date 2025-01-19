@@ -5,7 +5,7 @@ import fs from "fs";
 import cloudinary from "../utils/cloudinary.js";
 import streamifier from "streamifier";
 import UserModel from "../models/user.model.js";
-
+import CourseDetailModel from "../models/course-detail.model.js";
 export const getCourses = async (req, res) => {
   try {
     const courses = await CourseModel.find({
@@ -205,7 +205,7 @@ export const updateCourse = async (req, res) => {
       new: true,
     });
 
-    return res.json({
+    return res.status(200).json({
       message: "Update Course Success",
       data: course,
     });
@@ -232,11 +232,45 @@ export const deleteCourse = async (req, res) => {
     await cloudinary.uploader.destroy(course.thumbnail);
     await CourseModel.findByIdAndDelete(id);
 
-    return res.json({
+    return res.status(200).json({
       message: "Delete course success",
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error.message,
+    });
+  }
+};
+
+export const postContentCourse = async (req, res) => {
+  try {
+    const body = req.body;
+
+    const course = await CourseModel.findById(body.courseId);
+
+    const content = new CourseDetailModel({
+      title: body.title,
+      type: body.type,
+      course: course._id,
+      youtubeId: body.youtubeId,
+      text: body.text,
+    });
+
+    await content.save();
+    await CourseModel.findByIdAndUpdate(
+      course._id,
+      {
+        $push: { details: content._id },
+      },
+      { new: true }
+    );
+
+    return res.status(201).json({
+      message: "Content created successfully",
+    });
+  } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
       detail: error.message,

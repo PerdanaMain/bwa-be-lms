@@ -11,7 +11,7 @@ const courseDetailModel = mongoose.Schema(
       enum: ["video", "text"],
       default: "video",
     },
-    videoId: mongoose.Schema.Types.String, // optional
+    youtubeId: mongoose.Schema.Types.String, // optional
     text: mongoose.Schema.Types.String, // optional
     course: {
       type: mongoose.Schema.Types.ObjectId,

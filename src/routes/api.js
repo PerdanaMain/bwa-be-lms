@@ -8,6 +8,7 @@ import {
   updateCourse,
   getCourseById,
   postContentCourse,
+  updateContentCourse,
 } from "../controllers/course.controller.js";
 import { mutateContentSchema } from "../utils/schema.js";
 import { handlePayment } from "../controllers/payment.controller.js";
@@ -48,6 +49,12 @@ router.post(
   verifyToken,
   validateRequest(mutateContentSchema),
   postContentCourse
+);
+router.put(
+  "/courses/content/:id",
+  verifyToken,
+  validateRequest(mutateContentSchema),
+  updateContentCourse
 );
 
 // CATEGORY ROUTES

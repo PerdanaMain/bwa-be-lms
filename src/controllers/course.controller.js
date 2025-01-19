@@ -277,3 +277,33 @@ export const postContentCourse = async (req, res) => {
     });
   }
 };
+
+export const updateContentCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+
+    const course = await CourseModel.findById(body.courseId);
+
+    await CourseDetailModel.findByIdAndUpdate(
+      id,
+      {
+        title: body.title,
+        type: body.type,
+        course: course._id,
+        youtubeId: body.youtubeId,
+        text: body.text,
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      message: "Content updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error.message,
+    });
+  }
+};

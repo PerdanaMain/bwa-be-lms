@@ -250,6 +250,24 @@ export const deleteCourse = async (req, res) => {
   }
 };
 
+export const getContentCourse = async (req, res) => {
+  try {
+    const { id } = req?.params;
+
+    const content = await CourseDetailModel.findById(id);
+
+    return res.status(200).json({
+      message: "Get content course successfully",
+      data: content,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error?.message,
+    });
+  }
+};
+
 export const postContentCourse = async (req, res) => {
   try {
     const body = req.body;

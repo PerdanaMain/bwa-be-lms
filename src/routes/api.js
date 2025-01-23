@@ -10,6 +10,7 @@ import {
   postContentCourse,
   updateContentCourse,
   deleteContentCourse,
+  getContentCourse,
 } from "../controllers/course.controller.js";
 import { mutateContentSchema } from "../utils/schema.js";
 import { handlePayment } from "../controllers/payment.controller.js";
@@ -45,6 +46,7 @@ router.put(
 router.delete("/courses/:id", verifyToken, deleteCourse);
 
 // CONTENT ROUTES
+router.get("/courses/content/:id", verifyToken, getContentCourse);
 router.post(
   "/courses/content",
   verifyToken,

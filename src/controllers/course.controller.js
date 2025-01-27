@@ -1,11 +1,11 @@
-import CourseModel from "../models/course.model.js";
-import { mutateCourseSchema } from "../utils/schema.js";
-import CategoryModel from "../models/category.model.js";
 import fs from "fs";
-import cloudinary from "../utils/cloudinary.js";
-import streamifier from "streamifier";
-import UserModel from "../models/user.model.js";
+import CategoryModel from "../models/category.model.js";
 import CourseDetailModel from "../models/course-detail.model.js";
+import CourseModel from "../models/course.model.js";
+import UserModel from "../models/user.model.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
+import { mutateCourseSchema } from "../utils/schema.js";
+
 export const getCourses = async (req, res) => {
   try {
     const courses = await CourseModel.find({
@@ -73,32 +73,6 @@ export const getCourseById = async (req, res) => {
       .status(500)
       .json({ message: "Internal Server Error", detail: error.message });
   }
-};
-
-const uploadToCloudinary = (buffer) => {
-  return new Promise((resolve, reject) => {
-    // Pastikan buffer ada dan valid
-    if (!buffer) {
-      reject(new Error("No buffer to upload"));
-      return;
-    }
-
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: "bwa-lms",
-      },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
-
-    // Tambahkan error handling untuk stream
-    const stream = streamifier.createReadStream(buffer);
-    stream.on("error", (error) => reject(error));
-
-    stream.pipe(uploadStream);
-  });
 };
 
 export const postCourse = async (req, res) => {

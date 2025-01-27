@@ -17,6 +17,7 @@ import {
   updateCourse,
 } from "../controllers/course.controller.js";
 import { handlePayment } from "../controllers/payment.controller.js";
+import { getStudents, postStudent } from "../controllers/student.controller.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
 import { verifyToken } from "../middlewares/verify-token.middleware.js";
 import { fileFilter, fileStorageCourse } from "../utils/multer.js";
@@ -25,7 +26,6 @@ import {
   signInSchema,
   signUpSchema,
 } from "../utils/schema.js";
-import { getStudents } from "../controllers/student.controller.js";
 
 const router = express.Router();
 const upload = multer({
@@ -67,6 +67,7 @@ router.delete("/courses/content/:id", verifyToken, deleteContentCourse);
 
 // STUDENT ROUTES
 router.get("/students", verifyToken, getStudents);
+router.post("/students", verifyToken, upload.single("photo"), postStudent);
 
 // CATEGORY ROUTES
 router.get("/categories", getCategories);

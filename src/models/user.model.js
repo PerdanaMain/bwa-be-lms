@@ -29,7 +29,7 @@ const userModel = new mongoose.Schema(
         ref: "Course",
       },
     ],
-    managers: {
+    manager: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },

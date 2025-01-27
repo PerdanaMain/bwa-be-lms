@@ -23,6 +23,13 @@ function main() {
 
   app.use("/api", api);
 
+  //  handle any errors
+  app.use((err, req, res, next) => {
+    res
+      .status(500)
+      .json({ message: "Internal server error", detail: err.message });
+  });
+
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });

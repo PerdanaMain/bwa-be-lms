@@ -2,26 +2,29 @@ import express from "express";
 import multer from "multer";
 import { signInAction, signUpAction } from "../controllers/auth.controller.js";
 import {
-  deleteCourse,
-  getCourses,
-  postCourse,
-  updateCourse,
-  getCourseById,
-  postContentCourse,
-  updateContentCourse,
+  getCategories,
+  postCategory,
+} from "../controllers/category.controller.js";
+import {
   deleteContentCourse,
+  deleteCourse,
   getContentCourse,
+  getCourseById,
+  getCourses,
+  postContentCourse,
+  postCourse,
+  updateContentCourse,
+  updateCourse,
 } from "../controllers/course.controller.js";
-import { mutateContentSchema } from "../utils/schema.js";
 import { handlePayment } from "../controllers/payment.controller.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
 import { verifyToken } from "../middlewares/verify-token.middleware.js";
 import { fileFilter, fileStorageCourse } from "../utils/multer.js";
-import { signInSchema, signUpSchema } from "../utils/schema.js";
 import {
-  getCategories,
-  postCategory,
-} from "../controllers/category.controller.js";
+  mutateContentSchema,
+  signInSchema,
+  signUpSchema,
+} from "../utils/schema.js";
 
 const router = express.Router();
 const upload = multer({

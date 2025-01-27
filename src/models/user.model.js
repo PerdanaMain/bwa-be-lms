@@ -29,12 +29,10 @@ const userModel = new mongoose.Schema(
         ref: "Course",
       },
     ],
-    managers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    managers: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamp: true,

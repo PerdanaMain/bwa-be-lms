@@ -25,6 +25,7 @@ import {
   signInSchema,
   signUpSchema,
 } from "../utils/schema.js";
+import { getStudents } from "../controllers/student.controller.js";
 
 const router = express.Router();
 const upload = multer({
@@ -63,6 +64,9 @@ router.put(
   updateContentCourse
 );
 router.delete("/courses/content/:id", verifyToken, deleteContentCourse);
+
+// STUDENT ROUTES
+router.get("/students", verifyToken, getStudents);
 
 // CATEGORY ROUTES
 router.get("/categories", getCategories);

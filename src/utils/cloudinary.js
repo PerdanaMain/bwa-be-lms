@@ -11,6 +11,14 @@ cloudinary.config({
   secure: true,
 });
 
+export const getUrlCloudinary = (url) => {
+  return cloudinary.url(url);
+};
+
+export const destroyImageCloudinary = (url) => {
+  return cloudinary.uploader.destroy(url);
+};
+
 export const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
     // Pastikan buffer ada dan valid

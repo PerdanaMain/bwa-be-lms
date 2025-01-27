@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import UserModel from "../models/user.model.js";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
+import { uploadToCloudinary, getUrlCloudinary } from "../utils/cloudinary.js";
 import { mutateStudentSchema } from "../utils/schema.js";
 
 export const getStudents = async (req, res) => {
@@ -10,9 +10,16 @@ export const getStudents = async (req, res) => {
       manager: req?.user?._id,
     });
 
+    const data = students?.map((item) => {
+      return {
+        ...item.toObject(),
+        photoUrl: getUrlCloudinary(item?.photo),
+      };
+    });
+
     return res.status(200).json({
       message: "Get students successfully",
-      data: students,
+      data,
     });
   } catch (error) {
     return res.status(500).json({

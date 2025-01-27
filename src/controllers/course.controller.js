@@ -3,7 +3,11 @@ import CategoryModel from "../models/category.model.js";
 import CourseDetailModel from "../models/course-detail.model.js";
 import CourseModel from "../models/course.model.js";
 import UserModel from "../models/user.model.js";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+  uploadToCloudinary,
+  getUrlCloudinary,
+  destroyImageCloudinary,
+} from "../utils/cloudinary.js";
 import { mutateCourseSchema } from "../utils/schema.js";
 
 export const getCourses = async (req, res) => {
@@ -24,7 +28,7 @@ export const getCourses = async (req, res) => {
     const response = courses.map((course) => {
       return {
         ...course.toObject(),
-        thumbnailUrl: cloudinary.url(course.thumbnail),
+        thumbnailUrl: getUrlCloudinary(course?.thumbnail),
         total_students: course.students.length,
       };
     });
@@ -60,7 +64,7 @@ export const getCourseById = async (req, res) => {
 
     const response = {
       ...course.toObject(),
-      thumbnailUrl: cloudinary.url(course.thumbnail),
+      thumbnailUrl: getUrlCloudinary(course?.thumbnail),
       total_students: course.students.length,
     };
 
@@ -174,7 +178,7 @@ export const updateCourse = async (req, res) => {
       manager: req.user._id,
     };
 
-    await cloudinary.uploader.destroy(oldCourse.thumbnail);
+    await destroyImageCloudinary(oldCourse?.thumbnail);
 
     if (req?.file?.buffer) {
       const thumbnailInfo = await uploadToCloudinary(req?.file?.buffer);
@@ -209,7 +213,8 @@ export const deleteCourse = async (req, res) => {
       });
     }
 
-    await cloudinary.uploader.destroy(course.thumbnail);
+    await destroyImageCloudinary(course?.thumbnail);
+
     await CourseModel.findByIdAndDelete(id);
 
     return res.status(200).json({

@@ -17,7 +17,11 @@ import {
   updateCourse,
 } from "../controllers/course.controller.js";
 import { handlePayment } from "../controllers/payment.controller.js";
-import { getStudents, postStudent } from "../controllers/student.controller.js";
+import {
+  getStudents,
+  postStudent,
+  updateStudent,
+} from "../controllers/student.controller.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
 import { verifyToken } from "../middlewares/verify-token.middleware.js";
 import { fileFilter, fileStorageCourse } from "../utils/multer.js";
@@ -68,6 +72,7 @@ router.delete("/courses/content/:id", verifyToken, deleteContentCourse);
 // STUDENT ROUTES
 router.get("/students", verifyToken, getStudents);
 router.post("/students", verifyToken, upload.single("photo"), postStudent);
+router.put("/students/:id", verifyToken, upload.single("photo"), updateStudent);
 
 // CATEGORY ROUTES
 router.get("/categories", getCategories);

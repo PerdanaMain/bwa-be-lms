@@ -68,3 +68,55 @@ export const postStudent = async (req, res) => {
     });
   }
 };
+
+export const updateStudent = async (req, res) => {
+  try {
+    const { id } = req?.params;
+    const body = req?.body;
+    const parse = mutateStudentSchema
+      .partial({
+        password: true,
+      })
+      .safeParse(body);
+
+    if (!parse.success) {
+      const errorMessages = parse.error.issues.map((err) => err.message);
+
+      return res.status(500).json({
+        message: "Invalid input",
+        detail: errorMessages,
+      });
+    }
+
+    const oldStudent = await UserModel.findById(id);
+    const photoInfo = {
+      public_id: oldStudent?.photo || "",
+    };
+
+    if (req?.file) {
+      const photo = await uploadToCloudinary(req?.file?.buffer);
+      photoInfo.public_id = photo?.public_id;
+    }
+
+    const hashPassword = parse?.data?.password
+      ? bcrypt.hashSync(body?.password, 12)
+      : oldStudent?.password;
+
+    await UserModel.findByIdAndUpdate(id, {
+      name: parse?.data?.name,
+      email: parse?.data?.email,
+      password: hashPassword,
+      photo: photoInfo.public_id,
+    });
+
+    return res.status(200).json({
+      message: "Update student successfully",
+      data: null,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error?.message,
+    });
+  }
+};

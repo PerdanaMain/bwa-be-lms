@@ -1,7 +1,12 @@
 import bcrypt from "bcrypt";
 import UserModel from "../models/user.model.js";
-import { uploadToCloudinary, getUrlCloudinary } from "../utils/cloudinary.js";
+import {
+  uploadToCloudinary,
+  getUrlCloudinary,
+  destroyImageCloudinary,
+} from "../utils/cloudinary.js";
 import { mutateStudentSchema } from "../utils/schema.js";
+import CourseModel from "../models/course.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -20,6 +25,24 @@ export const getStudents = async (req, res) => {
     return res.status(200).json({
       message: "Get students successfully",
       data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error?.message,
+    });
+  }
+};
+
+export const getStudent = async (req, res) => {
+  try {
+    const { id } = req?.param;
+
+    const student = await UserModel.findById(id);
+
+    return res.status(200).json({
+      message: "Get students successfully",
+      student,
     });
   } catch (error) {
     return res.status(500).json({
@@ -111,6 +134,44 @@ export const updateStudent = async (req, res) => {
 
     return res.status(200).json({
       message: "Update student successfully",
+      data: null,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      detail: error?.message,
+    });
+  }
+};
+
+export const deleteStudent = async (req, res) => {
+  try {
+    const { id } = req?.params;
+    const student = await UserModel.findById(id);
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found!",
+        data: null,
+      });
+    }
+
+    await CourseModel.findOneAndUpdate(
+      {
+        students: student?._id,
+      },
+      {
+        $pull: {
+          students: student?._id,
+        },
+      }
+    );
+
+    await destroyImageCloudinary(student?.photo);
+    await UserModel.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      message: "Delete student successfully",
       data: null,
     });
   } catch (error) {

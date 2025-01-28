@@ -18,6 +18,8 @@ import {
 } from "../controllers/course.controller.js";
 import { handlePayment } from "../controllers/payment.controller.js";
 import {
+  deleteStudent,
+  getStudent,
   getStudents,
   postStudent,
   updateStudent,
@@ -71,8 +73,10 @@ router.delete("/courses/content/:id", verifyToken, deleteContentCourse);
 
 // STUDENT ROUTES
 router.get("/students", verifyToken, getStudents);
+router.get("/students", verifyToken, getStudent);
 router.post("/students", verifyToken, upload.single("photo"), postStudent);
 router.put("/students/:id", verifyToken, upload.single("photo"), updateStudent);
+router.delete("/students/:id", verifyToken, deleteStudent);
 
 // CATEGORY ROUTES
 router.get("/categories", getCategories);
